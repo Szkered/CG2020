@@ -114,23 +114,23 @@ template <typename V, typename E, typename F, typename H> class TCutGraphMesh : 
     typedef F CFace;
     typedef H CHalfEdge;
 
-    typedef CBoundary<V, E, F, H> CBoundary;
-    typedef CLoop<V, E, F, H> CLoop;
+    typedef CBoundary<V, E, F, H> CBoundary_;
+    typedef CLoop<V, E, F, H> CLoop_;
 
-    typedef MeshVertexIterator<V, E, F, H> MeshVertexIterator;
-    typedef MeshEdgeIterator<V, E, F, H> MeshEdgeIterator;
-    typedef MeshFaceIterator<V, E, F, H> MeshFaceIterator;
-    typedef MeshHalfEdgeIterator<V, E, F, H> MeshHalfEdgeIterator;
+    typedef MeshVertexIterator<V, E, F, H> MeshVertexIterator_;
+    typedef MeshEdgeIterator<V, E, F, H> MeshEdgeIterator_;
+    typedef MeshFaceIterator<V, E, F, H> MeshFaceIterator_;
+    typedef MeshHalfEdgeIterator<V, E, F, H> MeshHalfEdgeIterator_;
 
-    typedef VertexVertexIterator<V, E, F, H> VertexVertexIterator;
-    typedef VertexEdgeIterator<V, E, F, H> VertexEdgeIterator;
-    typedef VertexFaceIterator<V, E, F, H> VertexFaceIterator;
-    typedef VertexInHalfedgeIterator<V, E, F, H> VertexInHalfedgeIterator;
-    typedef VertexOutHalfedgeIterator<V, E, F, H> VertexOutHalfedgeIterator;
+    typedef VertexVertexIterator<V, E, F, H> VertexVertexIterator_;
+    typedef VertexEdgeIterator<V, E, F, H> VertexEdgeIterator_;
+    typedef VertexFaceIterator<V, E, F, H> VertexFaceIterator_;
+    typedef VertexInHalfedgeIterator<V, E, F, H> VertexInHalfedgeIterator_;
+    typedef VertexOutHalfedgeIterator<V, E, F, H> VertexOutHalfedgeIterator_;
 
-    typedef FaceVertexIterator<V, E, F, H> FaceVertexIterator;
-    typedef FaceEdgeIterator<V, E, F, H> FaceEdgeIterator;
-    typedef FaceHalfedgeIterator<V, E, F, H> FaceHalfedgeIterator;
+    typedef FaceVertexIterator<V, E, F, H> FaceVertexIterator_;
+    typedef FaceEdgeIterator<V, E, F, H> FaceEdgeIterator_;
+    typedef FaceHalfedgeIterator<V, E, F, H> FaceHalfedgeIterator_;
 };
 
 typedef TCutGraphMesh<CCutGraphVertex, CCutGraphEdge, CCutGraphFace, CCutGraphHalfEdge> CCutGraphMesh;

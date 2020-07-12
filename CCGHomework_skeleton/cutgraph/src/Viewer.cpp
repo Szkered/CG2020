@@ -60,11 +60,11 @@ void drawMesh()
 
     glLineWidth(1.0);
     glColor3f(229.0 / 255.0, 162.0 / 255.0, 141.0 / 255.0);
-    for (CCutGraphMesh::MeshFaceIterator fiter(&g_mesh); !fiter.end(); ++fiter)
+    for (CCutGraphMesh::MeshFaceIterator_ fiter(&g_mesh); !fiter.end(); ++fiter)
     {
         glBegin(GL_POLYGON);
         CCutGraphFace *pF = *fiter;
-        for (CCutGraphMesh::FaceVertexIterator fviter(pF); !fviter.end(); ++fviter)
+        for (CCutGraphMesh::FaceVertexIterator_ fviter(pF); !fviter.end(); ++fviter)
         {
             CCutGraphVertex *pV = *fviter;
             CPoint &p = pV->point();
@@ -92,7 +92,7 @@ void drawSharpEdges()
     glLineWidth(2.);
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_LINES);
-    for (CCutGraphMesh::MeshEdgeIterator eiter(&g_mesh); !eiter.end(); ++eiter)
+    for (CCutGraphMesh::MeshEdgeIterator_ eiter(&g_mesh); !eiter.end(); ++eiter)
     {
         CCutGraphEdge *pE = *eiter;
         if (pE->sharp() == true)
@@ -304,14 +304,14 @@ void mouseMove(int x, int y)
 void normalizeMesh(CCutGraphMesh *pMesh)
 {
     CPoint s(0, 0, 0);
-    for (CCutGraphMesh::MeshVertexIterator viter(pMesh); !viter.end(); ++viter)
+    for (CCutGraphMesh::MeshVertexIterator_ viter(pMesh); !viter.end(); ++viter)
     {
         CCutGraphVertex *v = *viter;
         s = s + v->point();
     }
     s = s / pMesh->numVertices();
 
-    for (CCutGraphMesh::MeshVertexIterator viter(pMesh); !viter.end(); ++viter)
+    for (CCutGraphMesh::MeshVertexIterator_ viter(pMesh); !viter.end(); ++viter)
     {
         CCutGraphVertex *v = *viter;
         CPoint p = v->point();
@@ -320,7 +320,7 @@ void normalizeMesh(CCutGraphMesh *pMesh)
     }
 
     double d = 0;
-    for (CCutGraphMesh::MeshVertexIterator viter(pMesh); !viter.end(); ++viter)
+    for (CCutGraphMesh::MeshVertexIterator_ viter(pMesh); !viter.end(); ++viter)
     {
         CCutGraphVertex *v = *viter;
         CPoint p = v->point();
@@ -330,7 +330,7 @@ void normalizeMesh(CCutGraphMesh *pMesh)
         }
     }
 
-    for (CCutGraphMesh::MeshVertexIterator viter(pMesh); !viter.end(); ++viter)
+    for (CCutGraphMesh::MeshVertexIterator_ viter(pMesh); !viter.end(); ++viter)
     {
         CCutGraphVertex *v = *viter;
         CPoint p = v->point();
@@ -344,11 +344,11 @@ void normalizeMesh(CCutGraphMesh *pMesh)
  */
 void computeNormal(CCutGraphMesh *pMesh)
 {
-    for (CCutGraphMesh::MeshVertexIterator viter(pMesh); !viter.end(); ++viter)
+    for (CCutGraphMesh::MeshVertexIterator_ viter(pMesh); !viter.end(); ++viter)
     {
         CCutGraphVertex *v = *viter;
         CPoint n(0, 0, 0);
-        for (CCutGraphMesh::VertexFaceIterator vfiter(v); !vfiter.end(); ++vfiter)
+        for (CCutGraphMesh::VertexFaceIterator_ vfiter(v); !vfiter.end(); ++vfiter)
         {
             CCutGraphFace *pF = *vfiter;
 
@@ -399,6 +399,8 @@ void cut_graph(CCutGraphMesh *pMesh)
  */
 int main(int argc, char *argv[])
 {
+    printf("hey");
+
     if (argc < 2)
     {
         printf("Usage: %s input.m\n", argv[0]);

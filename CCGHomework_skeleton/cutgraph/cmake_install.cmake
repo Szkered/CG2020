@@ -1,4 +1,4 @@
-# Install script for directory: /home/zekun/workspace/CG2020/CCGHomework_skeleton
+# Install script for directory: /home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -37,10 +37,28 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for each subdirectory.
-  include("/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/cutgraph/cmake_install.cmake")
-
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  if(EXISTS "$ENV{DESTDIR}/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin/CutGraph" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin/CutGraph")
+    file(RPATH_CHECK
+         FILE "$ENV{DESTDIR}/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin/CutGraph"
+         RPATH "")
+  endif()
+  list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
+   "/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin/CutGraph")
+  if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+  if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
+    message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
+  endif()
+file(INSTALL DESTINATION "/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin" TYPE EXECUTABLE FILES "/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/CutGraph")
+  if(EXISTS "$ENV{DESTDIR}/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin/CutGraph" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin/CutGraph")
+    if(CMAKE_INSTALL_DO_STRIP)
+      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/zekun/workspace/CG2020/CCGHomework_skeleton/cutgraph/bin/CutGraph")
+    endif()
+  endif()
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
