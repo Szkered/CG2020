@@ -1,0 +1,12 @@
+.DS_Store
+.idea
+*.log
+tmp/
+.ccls-cache
+.clangd
+*build*
+*CMakeFiles/
+*Makefile
+*CMakeCache.txt
+*compile_commands.json
+*.cmake
