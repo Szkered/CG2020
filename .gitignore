@@ -9,4 +9,3 @@ tmp/
 *Makefile
 *CMakeCache.txt
 *compile_commands.json
-*.cmake

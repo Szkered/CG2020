@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.6)
 # Name the project
 project(CCGHomework)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -std=c++17 -pthread")
+# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -std=c++17 -pthread")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -pthread")
 
 # Find MeshLib
 find_package(MeshLib REQUIRED

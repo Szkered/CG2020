@@ -1,9 +1,9 @@
 /*!
-*      \file strutil.h
-*      \brief std::string utilities
-*      \date Documented on 10/08/2010
-*
-*/
+ *      \file strutil.h
+ *      \brief std::string utilities
+ *      \date Documented on 10/08/2010
+ *
+ */
 
 #pragma once
 
@@ -12,80 +12,82 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <functional>
+#include <cctype>
 
 // declaration
-namespace strutil {
+namespace strutil
+{
 
 using namespace std;
 
-inline std::string trimLeft(const std::string& str)
+inline std::string trimLeft(const std::string &str)
 {
     string t = str;
     t.erase(0, t.find_first_not_of(" \t\n\r"));
     return t;
 };
 
-inline std::string trimRight(const std::string& str)
+inline std::string trimRight(const std::string &str)
 {
     string t = str;
     t.erase(t.find_last_not_of(" \t\n\r") + 1);
     return t;
 };
 
-inline std::string trim(const std::string& str)
+inline std::string trim(const std::string &str)
 {
-	string t = str;
+    string t = str;
     t.erase(0, t.find_first_not_of(" \t\n\r"));
     t.erase(t.find_last_not_of(" \t\n\r") + 1);
     return t;
 };
 
-inline std::string trim(const std::string& str, const std::string & delimitor)
+inline std::string trim(const std::string &str, const std::string &delimitor)
 {
     string t = str;
     t.erase(0, t.find_first_not_of(delimitor));
     t.erase(t.find_last_not_of(delimitor) + 1);
     return t;
 };
- 
-inline	std::string toLower(const std::string& str)
+
+inline std::string toLower(const std::string &str)
 {
     string t = str;
-    transform(t.begin(), t.end(), t.begin(), tolower);
+    transform(t.begin(), t.end(), t.begin(), ptr_fun<int, int>(tolower));
     return t;
 };
 
-inline  std::string toUpper(const std::string& str)
+inline std::string toUpper(const std::string &str)
 {
     string t = str;
-    transform(t.begin(), t.end(), t.begin(), toupper);
+    transform(t.begin(), t.end(), t.begin(), ptr_fun<int, int>(toupper));
     return t;
 };
 
-inline  bool startsWith(const std::string& str, const std::string& substr)
+inline bool startsWith(const std::string &str, const std::string &substr)
 {
-	return str.find(substr) == 0;
-};
-  
-inline bool endsWith(const std::string& str, const std::string& substr)
-{
-	return (str.rfind(substr) == (str.length() - substr.length()) && str.rfind(substr) >= 0 );
+    return str.find(substr) == 0;
 };
 
-inline bool equalsIgnoreCase(const std::string& str1, const std::string& str2)
+inline bool endsWith(const std::string &str, const std::string &substr)
 {
-  return toLower(str1) == toLower(str2);
+    return (str.rfind(substr) == (str.length() - substr.length()) && str.rfind(substr) >= 0);
 };
 
+inline bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
+{
+    return toLower(str1) == toLower(str2);
+};
 
-inline    std::string toString(const bool& value)
+inline std::string toString(const bool &value)
 {
     ostringstream oss;
     oss << boolalpha << value;
     return oss.str();
 };
 
-template<bool> bool parseString(const std::string& str) 
+template <bool> bool parseString(const std::string &str)
 {
     bool value;
     std::istringstream iss(str);
@@ -93,118 +95,132 @@ template<bool> bool parseString(const std::string& str)
     return value;
 };
 
-
-template<class T> T parseString(const std::string& str) {
+template <class T> T parseString(const std::string &str)
+{
     T value;
     std::istringstream iss(str);
     iss >> value;
     return value;
 };
 
-template<class T> T parseHexString(const std::string& str) {
+template <class T> T parseHexString(const std::string &str)
+{
     T value;
     std::istringstream iss(str);
     iss >> hex >> value;
     return value;
 };
 
-template<class T> std::string toString(const T& value) {
+template <class T> std::string toString(const T &value)
+{
     std::ostringstream oss;
     oss << value;
     return oss.str();
 };
 
-template<class T> std::string toHexString(const T& value, int width) {
+template <class T> std::string toHexString(const T &value, int width)
+{
     std::ostringstream oss;
     oss << hex;
-    if (width > 0) {
+    if (width > 0)
+    {
         oss << setw(width) << setfill('0');
     }
     oss << value;
     return oss.str();
 };
 
-}
+} // namespace strutil
 
 // Tokenizer class
-namespace strutil {
-
-	/*!
-	*	\brief String Tokenizer
-	*
-	*	String tokenizer, which separate the whole string to tokens.
-	*/
-    class Tokenizer
-    {
-    public:
-        Tokenizer(const std::string& str)
-        : m_String(str), m_Offset(0), m_Delimiters("  ") {};
-
-        Tokenizer(const std::string& str, const std::string& delimiters)
-		: m_String(str), m_Offset(0), m_Delimiters(delimiters) {};
-        
-		bool nextToken() { return nextToken(m_Delimiters); };
-		
-
-        bool nextToken(const std::string& delimiters)
-		{
-			// find the start charater of the next token.
-			size_t i = m_String.find_first_not_of(delimiters, m_Offset);
-			if (i == string::npos) {
-				m_Offset = m_String.length();
-				return false;
-			}
-
-			// find the end of the token.
-			size_t j = m_String.find_first_of(delimiters, i);
-			if (j == string::npos) {
-				m_Token = m_String.substr(i);
-				m_Offset = m_String.length();
-				return true;
-			}
-
-			// to intercept the token and save current position
-			m_Token = m_String.substr(i, j - i);
-			m_Offset = j;
-			return true;
-    };
-
-
-		const std::string getToken() const { return m_Token;};
-
-        /**
-        * to reset the tokenizer. After reset it, the tokenizer can get
-        * the tokens from the first token.
-        */
-		void reset() { m_Offset = 0; };
-
-    protected:
-        size_t m_Offset;
-        const std::string m_String;
-        std::string m_Token;
-        std::string m_Delimiters;
-    };
-
-};
-
-namespace strutil {
-
-inline std::vector<std::string> split(const std::string& str, const std::string& delimiters)
+namespace strutil
 {
-        vector<string> ss;
 
-        Tokenizer tokenizer(str, delimiters);
-        while (tokenizer.nextToken()) 
-		{
-            ss.push_back(tokenizer.getToken());
+/*!
+ *	\brief String Tokenizer
+ *
+ *	String tokenizer, which separate the whole string to tokens.
+ */
+class Tokenizer
+{
+  public:
+    Tokenizer(const std::string &str) : m_String(str), m_Offset(0), m_Delimiters("  "){};
+
+    Tokenizer(const std::string &str, const std::string &delimiters)
+        : m_String(str), m_Offset(0), m_Delimiters(delimiters){};
+
+    bool nextToken()
+    {
+        return nextToken(m_Delimiters);
+    };
+
+    bool nextToken(const std::string &delimiters)
+    {
+        // find the start charater of the next token.
+        size_t i = m_String.find_first_not_of(delimiters, m_Offset);
+        if (i == string::npos)
+        {
+            m_Offset = m_String.length();
+            return false;
         }
 
-        return ss;
+        // find the end of the token.
+        size_t j = m_String.find_first_of(delimiters, i);
+        if (j == string::npos)
+        {
+            m_Token = m_String.substr(i);
+            m_Offset = m_String.length();
+            return true;
+        }
+
+        // to intercept the token and save current position
+        m_Token = m_String.substr(i, j - i);
+        m_Offset = j;
+        return true;
+    };
+
+    const std::string getToken() const
+    {
+        return m_Token;
+    };
+
+    /**
+     * to reset the tokenizer. After reset it, the tokenizer can get
+     * the tokens from the first token.
+     */
+    void reset()
+    {
+        m_Offset = 0;
+    };
+
+  protected:
+    size_t m_Offset;
+    const std::string m_String;
+    std::string m_Token;
+    std::string m_Delimiters;
 };
 
+}; // namespace strutil
+
+namespace strutil
+{
+
+inline std::vector<std::string> split(const std::string &str, const std::string &delimiters)
+{
+    vector<string> ss;
+
+    Tokenizer tokenizer(str, delimiters);
+    while (tokenizer.nextToken())
+    {
+        ss.push_back(tokenizer.getToken());
+    }
+
+    return ss;
 };
+
+}; // namespace strutil
 /*
-struct string_token_iterator 
+struct string_token_iterator
   : public std::iterator<std::input_iterator_tag, std::string>
 {
 public:
@@ -273,4 +289,3 @@ private:
   std::string::size_type end;
 };
 */
-
