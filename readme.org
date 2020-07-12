@@ -1,0 +1,13 @@
+#+TITLE: Computational Conformal Geometry 2020 Summer School
+* Installation on Ubuntu / PopOS
+** freeglut
+The freeglut provided was for Windows (.dll), so we need to obtain our own freeglut:
+  #+BEGIN_SRC sh
+sudo apt-get install freeglut3 freeglut3-dev
+   #+END_SRC
+** MeshLib
+I modified some code in the MeshLib as it was build for window.
+1. ~typename~ in template return type declaration.
+2. ~#include <deque>~
+3. cast the ~__unary_op~ to appropriate type in ~std::transform~: ~transform(t.begin(), t.end(), t.begin(), ptr_fun<int, int>(tolower));~
+4. Naming conflict in ~CutGraphMesh.h~
