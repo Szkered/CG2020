@@ -39,7 +39,7 @@ class CHalfEdge
     };
     /*!	Destructure.
      */
-    ~CHalfEdge(){};
+    virtual ~CHalfEdge(){};
 
     /*! Pointer to the edge attaching to the current halfedge. */
     CEdge *&edge()

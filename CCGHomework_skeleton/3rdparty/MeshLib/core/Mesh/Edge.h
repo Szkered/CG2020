@@ -37,7 +37,7 @@ class CEdge
     /*!
         CEdge destructor.
     */
-    ~CEdge(){};
+    virtual ~CEdge(){};
     /*!
         Edge ID
      */

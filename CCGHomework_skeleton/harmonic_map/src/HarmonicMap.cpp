@@ -1,3 +1,4 @@
+#include <cmath>
 #include <math.h>
 #include <float.h>
 
@@ -26,7 +27,8 @@ void MeshLib::CHarmonicMap::set_mesh(CHarmonicMapMesh *pMesh)
         M::CVertex *pV = *viter;
         if (pV->boundary())
             continue;
-        // insert your code here
+        CPoint2 suv = CPoint2(0, 0);
+        pV->uv() = suv;
     }
 }
 
@@ -54,7 +56,11 @@ double MeshLib::CHarmonicMap::step_one()
         {
             M::CVertex *pW = *vviter;
             M::CEdge *pE = m_pMesh->vertexEdge(pV, pW);
-            // insert your code here
+            double w = pE->weight();
+            CPoint2 uv_w = pW->uv();
+            sw += w;
+            uv_w *= w;
+            suv += uv_w;
         }
         suv /= sw;
 
@@ -210,16 +216,32 @@ void MeshLib::CHarmonicMap::_calculate_edge_weight()
     {
         M::CFace *pF = *fiter;
         M::CHalfEdge *pH[3];
-        // insert your code here
-        // use inverse cosine law to compute the corner angles
+
+        int i = 0;
+        for (M::FaceHalfedgeIterator_ fhiter(pF); !fhiter.end(); ++fhiter, i++)
+        {
+            pH[i] = *fhiter;
+            M::CEdge *pE = dynamic_cast<M::CEdge *>(pH[i]->edge()); // HACK: cast edge to the right type
+        }
+
+        auto getLength = [=](int i) { return m_pMesh->halfedgeEdge(pH[i])->length(); };
+        for (int i = 0; i < 3; i++)
+        {
+            // store the angle between other two edges in radians
+            double cs = _inverse_cosine_law(getLength((i + 1) % 3), getLength((i + 2) % 3), getLength(i));
+            pH[i]->angle() = cs;
+        }
     }
 
     // 3. compute edge weight
     for (M::MeshEdgeIterator_ eiter(m_pMesh); !eiter.end(); ++eiter)
     {
         M::CEdge *pE = *eiter;
-        // insert your code here
-        // set cotangent edge weight
+
+        pE->weight() += std::tan(M_PI_2 - m_pMesh->edgeHalfedge(pE, 0)->angle());
+
+        if (M::CHalfEdge *otherHe = m_pMesh->edgeHalfedge(pE, 1))
+            pE->weight() += std::tan(M_PI_2 - otherHe->angle());
     }
 }
 
