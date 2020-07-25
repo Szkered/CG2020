@@ -16,8 +16,8 @@
 #include <queue>
 
 #include "Mesh/BaseMesh.h"
-#include "Mesh/boundary.h"
-#include "Mesh/iterators.h"
+#include "Mesh/Boundary.h"
+#include "Mesh/Iterators.h"
 
 namespace MeshLib
 {

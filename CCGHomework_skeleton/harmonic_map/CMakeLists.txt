@@ -29,11 +29,6 @@ file(GLOB SRCS
 # the source files.
 add_executable(HarmonicMap ${SRCS})
 
-# find_package(OpenGL REQUIRED)
-# find_package(GLUT REQUIRED)
-# include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
-# target_link_libraries(CutGraph ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
-
 # Link the libraries of freeglut
 if(MSVC)
   if(CMAKE_CL_64)

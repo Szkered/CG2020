@@ -399,8 +399,6 @@ void cut_graph(CCutGraphMesh *pMesh)
  */
 int main(int argc, char *argv[])
 {
-    printf("hey");
-
     if (argc < 2)
     {
         printf("Usage: %s input.m\n", argv[0]);
