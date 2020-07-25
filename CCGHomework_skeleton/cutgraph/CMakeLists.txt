@@ -20,8 +20,6 @@ file(GLOB SRCS
 # the source files.
 add_executable(CutGraph ${SRCS})
 
-
-
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )

@@ -1,0 +1,3 @@
+[submodule "CCGHomework_skeleton/3rdparty/eigen"]
+	path = CCGHomework_skeleton/3rdparty/eigen
+	url = https://gitlab.com/libeigen/eigen.git

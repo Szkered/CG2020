@@ -16,8 +16,8 @@
 #include "Mesh/HalfEdge.h"
 #include "Mesh/Edge.h"
 #include "Mesh/Face.h"
-#include "mesh/iterators.h"
-#include "mesh/boundary.h"
+#include "Mesh/Iterators.h"
+#include "Mesh/Boundary.h"
 #include "Parser/parser.h"
 
 #define VERTEX_RGB (0x01 << 0)

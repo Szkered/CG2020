@@ -7,8 +7,8 @@
 #include "Mesh/HalfEdge.h"
 #include "Mesh/Vertex.h"
 
-#include "Mesh/boundary.h"
-#include "Mesh/iterators.h"
+#include "Mesh/Boundary.h"
+#include "Mesh/Iterators.h"
 #include "Parser/parser.h"
 
 namespace MeshLib
