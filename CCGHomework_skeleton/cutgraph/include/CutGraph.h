@@ -14,24 +14,27 @@ namespace MeshLib
 class CCutGraph
 {
   public:
-    /*! 
+    /*!
      *  CCutGraph constructor
      *  \param pMesh input closed mesh
      */
-    CCutGraph(CCutGraphMesh* pMesh) { m_pMesh = pMesh; };
+    CCutGraph(CCutGraphMesh *pMesh)
+    {
+        m_pMesh = pMesh;
+    };
 
-    /*! 
+    /*!
      * Compute the cut graph.
      */
     void cut_graph();
 
   protected:
-    /*! 
+    /*!
      *  Input closed mesh.
      */
-    CCutGraphMesh* m_pMesh;
+    CCutGraphMesh *m_pMesh;
 
-    /*! 
+    /*!
      *  Compute the spanning tree of the dual mesh.
      */
     void _dual_spanning_tree();
@@ -39,7 +42,7 @@ class CCutGraph
     /*!
      * Prune the branches which attached to valence-1 nodes.
      */
-    void _prune();
+    bool _prune();
 };
 } // namespace MeshLib
 #endif // !_CUT_GRAPH_H_
