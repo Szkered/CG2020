@@ -13,13 +13,13 @@
 
 #define MAX_LINE 2048
 
-#include <assert.h>
-#include <fstream>
-#include <iostream>
-#include <list>
-#include <map>
 #include <math.h>
+#include <assert.h>
+#include <iostream>
+#include <fstream>
+#include <list>
 #include <vector>
+#include <map>
 
 #include "../Geometry/Point.h"
 #include "../Geometry/Point2.h"
@@ -32,10 +32,10 @@ namespace MeshLib
  * \brief CBaseMesh, base class for all types of mesh classes
  *
  *  This is the fundamental class for meshes. It includes a list of vertices,
- *  a list of edges, a list of faces. All the geometric objects are connected by
- * pointers, vertex, edge, face are connected by halfedges. The mesh class has
- * file IO functionalities, supporting .obj, .m and .off file formats. It offers
- * Euler operators, each geometric primative can access its neighbors freely.
+ *  a list of edges, a list of faces. All the geometric objects are connected by pointers,
+ *  vertex, edge, face are connected by halfedges. The mesh class has file IO functionalities,
+ *  supporting .obj, .m and .off file formats. It offers Euler operators, each geometric primative
+ *  can access its neighbors freely.
  *
  * \tparam CVertex   vertex   class, derived from MeshLib::CVertex   class
  * \tparam CEdge     edge     class, derived from MeshLib::CEdge     class
@@ -178,8 +178,7 @@ template <typename CVertex, typename CEdge, typename CFace, typename CHalfEdge> 
     Access a halfedge by its target vertex, and attaching face.
     \param v target vertex
     \param f attaching face
-    \return halfedge, whose target is v, attaching face is f. NULL if no such an
-    halfedge exists.
+    \return halfedge, whose target is v, attaching face is f. NULL if no such an halfedge exists.
     */
     tHalfEdge corner(tVertex v, tFace f);
 
@@ -251,8 +250,9 @@ template <typename CVertex, typename CEdge, typename CFace, typename CHalfEdge> 
     tHalfEdge vertexHalfedge(tVertex v);
     // v->edges
     /*!
-    The edge list attaching to the vertex v, such that v is the first vertex of
-    the edge \param v the input vertex. \return the reference to the edge list
+    The edge list attaching to the vertex v, such that v is the first vertex of the edge
+    \param v the input vertex.
+    \return the reference to the edge list
     */
     std::list<tEdge> &vertexEdges(tVertex v);
 
@@ -734,8 +734,7 @@ inline CHalfEdge *CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::vertexMostCcwOutH
     Access a halfedge by its target vertex, and attaching face.
     \param v target vertex
     \param f attaching face
-    \return halfedge, whose target is v, attaching face is f. NULL if no such an
-   halfedge exists.
+    \return halfedge, whose target is v, attaching face is f. NULL if no such an halfedge exists.
     */
 template <typename CVertex, typename CEdge, typename CFace, typename CHalfEdge>
 inline CHalfEdge *CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::corner(tVertex v, tFace f)
@@ -1550,7 +1549,7 @@ void CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::read_m(const char *input)
 /*!
     Write an .m file.
     \param output the output .m file name
-    */
+*/
 template <typename CVertex, typename CEdge, typename CFace, typename CHalfEdge>
 void CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::write_m(const char *output)
 {
@@ -1769,8 +1768,7 @@ void CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::write_off(const char *output)
     {
         tVertex v = *viter;
         _os << v->point()[0] << " " << v->point()[1] << " " << v->point()[2] << std::endl;
-        //_os << v->normal()[0] << " " << v->normal()[1]<< " " << v->normal()[2]<<
-        // std::endl;
+        //_os << v->normal()[0] << " " << v->normal()[1]<< " " << v->normal()[2]<< std::endl;
     }
 
     for (typename std::list<CFace *>::iterator fiter = m_faces.begin(); fiter != m_faces.end(); fiter++)
@@ -1793,8 +1791,8 @@ void CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::write_off(const char *output)
     _os.close();
 };
 
-// template pointer converting to base class pointer is OK (BasePointer) =
-// (TemplatePointer) (TemplatePointer)=(BasePointer) is incorrect
+// template pointer converting to base class pointer is OK (BasePointer) = (TemplatePointer)
+//(TemplatePointer)=(BasePointer) is incorrect
 /*! delete one face
 \param pFace the face to be deleted
 */
@@ -1838,9 +1836,8 @@ void CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::deleteFace(tFace pFace)
                     pV->halfedge() = pH->he_sym()->he_prev();
                 else
                 {
-                    // actually, pV should be an isolated vertex, if we delete faces
-                    // orderly, 'orderly' means keep the status of mesh in each step is
-                    // manifold.
+                    // actually, pV should be an isolated vertex, if we delete faces orderly,
+                    //'orderly' means keep the status of mesh in each step is manifold.
                     isolated_verts.push_back(pV);
                 }
             }
@@ -1890,8 +1887,9 @@ void CBaseMesh<CVertex, CEdge, CFace, CHalfEdge>::deleteFace(tFace pFace)
     delete pFace;
 
     // modified by Wei CHEN, 2018-2-13
-    for (auto pV : isolated_verts)
+    for (typename std::vector<CVertex *>::iterator vit = isolated_verts.begin(); vit != isolated_verts.end(); ++vit)
     {
+        CVertex *pV = *vit;
         typename std::map<int, CVertex *>::iterator viter = m_map_vert.find(pV->id());
         if (viter != m_map_vert.end())
             m_map_vert.erase(viter);

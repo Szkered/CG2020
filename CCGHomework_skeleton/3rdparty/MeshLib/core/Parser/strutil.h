@@ -12,8 +12,6 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
-#include <functional>
-#include <cctype>
 
 // declaration
 namespace strutil
@@ -54,14 +52,14 @@ inline std::string trim(const std::string &str, const std::string &delimitor)
 inline std::string toLower(const std::string &str)
 {
     string t = str;
-    transform(t.begin(), t.end(), t.begin(), ptr_fun<int, int>(tolower));
+    transform(t.begin(), t.end(), t.begin(), ::tolower);
     return t;
 };
 
 inline std::string toUpper(const std::string &str)
 {
     string t = str;
-    transform(t.begin(), t.end(), t.begin(), ptr_fun<int, int>(toupper));
+    transform(t.begin(), t.end(), t.begin(), ::toupper);
     return t;
 };
 

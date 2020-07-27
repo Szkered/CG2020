@@ -11,7 +11,7 @@
 
 #include "../Geometry/Point.h"
 #include "../Geometry/Point2.h"
-#include "../Geometry/quat.h"
+#include "../Geometry/Quat.h"
 
 namespace MeshLib
 {
@@ -55,8 +55,7 @@ class CArcball
      *	Update the arcball
      *	\param nx current x-position of mouse
      *    \param ny current y-position of mouse
-     *    \return quoternion of the roation from the old position to the new
-     *position
+     *    \return quoternion of the roation from the old position to the new position
      */
     CQrot update(int nx, int ny)
     {

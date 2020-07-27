@@ -13,9 +13,9 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
-#include <deque>
 #include <list>
 #include <set>
+#include <deque>
 
 #include "../Mesh/BaseMesh.h"
 #include "../Mesh/Iterators.h"
@@ -23,11 +23,11 @@
 namespace MeshLib
 {
 /*!
-  \brief CLoopSegment Boundary loop  segment class.
-  \tparam CVertex Vertex type
-  \tparam CEdge   Edge   type
-  \tparam CFace   Face   type
-  \tparam CHalfEdge HalfEdge type
+    \brief CLoopSegment Boundary loop  segment class.
+    \tparam CVertex Vertex type
+    \tparam CEdge   Edge   type
+    \tparam CFace   Face   type
+    \tparam CHalfEdge HalfEdge type
 */
 
 template <typename CVertex, typename CEdge, typename CFace, typename CHalfEdge> class CLoopSegment

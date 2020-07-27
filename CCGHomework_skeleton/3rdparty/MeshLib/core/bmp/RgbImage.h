@@ -186,12 +186,12 @@ class RgbImage
     \param data the long integter to write
     \param outfile output file
     */
-    static void RgbImage::writeLong(long data, FILE *outfile);
+    static void writeLong(long data, FILE *outfile);
     /*!	write a short integer to the file
     \param data the short integter to write
     \param outfile output file
     */
-    static void RgbImage::writeShort(short data, FILE *outfile);
+    static void writeShort(short data, FILE *outfile);
 
     /*!	convert a double to unsigned char
      * \param x input double number
