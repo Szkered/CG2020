@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.6)
 project(CCGHomework)
 
 if(NOT MSVC)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17 -pthread -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -pthread -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
+  # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17 -pthread -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
   # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 endif(NOT MSVC)
 

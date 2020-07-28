@@ -138,12 +138,19 @@ void MeshLib::CHarmonicMap::map()
             M::CEdge *e = m_pMesh->vertexEdge(pV, pW);
             double w = e->weight();
 
-            // insert your code here
-            // construct one element of the matrix A and B, using
-            // Eigen::Triplet<double>(i,j, val)
-            // there push_back the triplet to A or B coefficients
+            sw += w;
+
+            if (pW->boundary())
+            {
+                B_coefficients.push_back(Eigen::Triplet<double>(vid, wid, -w));
+            }
+            else
+            {
+                A_coefficients.push_back(Eigen::Triplet<double>(vid, wid, w));
+            }
         }
-        // insert the diagonal element
+
+        A_coefficients.push_back(Eigen::Triplet<double>(vid, vid, -sw));
     }
 
     Eigen::SparseMatrix<double> A(interior_vertices, interior_vertices);
