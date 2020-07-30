@@ -129,7 +129,7 @@ void MeshLib::CHodgeDecomposition::_d(int dimension)
             for (M::FaceHalfedgeIterator_ fhiter(pf); !fhiter.end(); fhiter++)
             {
                 M::CHalfEdge *ph = *fhiter;
-                ph->form() += m_pMesh->halfedgeSource(ph)->form();
+                ph->form() -= m_pMesh->halfedgeSource(ph)->form();
                 ph->form() += m_pMesh->halfedgeTarget(ph)->form();
             }
         }
@@ -145,15 +145,7 @@ void MeshLib::CHodgeDecomposition::_d(int dimension)
             for (M::FaceHalfedgeIterator_ fhiter(pf); !fhiter.end(); fhiter++)
             {
                 M::CHalfEdge *ph = *fhiter;
-
-                auto getWeight = [=](M::CHalfEdge *ph) { return m_pMesh->halfedgeEdge(ph)->weight(); };
-                M::CHalfEdge *ph1 = m_pMesh->halfedgeNext(ph);
-                M::CHalfEdge *ph2 = m_pMesh->halfedgeNext(ph1);
-                double w_all = getWeight(ph) * getWeight(ph1) * getWeight(ph2);
-                pf->form() += ph->form() * w_all;
-
-                // // simple solution
-                // pf->form() += ph->form();
+                pf->form() += ph->form();
             }
         }
         return;
@@ -370,23 +362,16 @@ void MeshLib::CHodgeDecomposition::_compute_coexact_form()
         {
             M::CHalfEdge *ph = *fhiter;
             M::CHalfEdge *ps = m_pMesh->halfedgeSym(ph);
+
             auto getWeight = [=](M::CHalfEdge *ph) { return m_pMesh->halfedgeEdge(ph)->weight(); };
+
+            double w = -1 / getWeight(ph);
+            sw += w;
+
             if (ps != NULL)
             {
                 int fid_ = m_pMesh->halfedgeFace(ps)->idx();
-
-                // // simple solution
-                // double w = -1 / m_pMesh->halfedgeEdge(ps)->weight();
-
-                M::CHalfEdge *ph1 = m_pMesh->halfedgeNext(ph);
-                M::CHalfEdge *ph2 = m_pMesh->halfedgeNext(ph1);
-                double w = -getWeight(ph1) * getWeight(ph2);
-
-                sw += w;
                 A_coefficients.push_back(Eigen::Triplet<double>(fid, fid_, w));
-            }
-            else
-            {
             }
         }
         A_coefficients.push_back(Eigen::Triplet<double>(fid, fid, -sw));
@@ -474,7 +459,16 @@ void MeshLib::CHodgeDecomposition::_remove_coexact_form()
             M::CHalfEdge *ph = *fhiter;
             M::CHalfEdge *ps = m_pMesh->halfedgeSym(ph);
             double w = m_pMesh->halfedgeEdge(ph)->weight();
-            double deltaSigma = (pf->form() - m_pMesh->halfedgeFace(ps)->form()) / w;
+
+            double deltaSigma = 0;
+            if (ps != NULL)
+            {
+                deltaSigma = (pf->form() - m_pMesh->halfedgeFace(ps)->form()) / w;
+            }
+            else
+            {
+                deltaSigma = pf->form() / w;
+            }
             ph->form() -= deltaSigma;
         }
     }
