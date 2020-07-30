@@ -33,6 +33,7 @@
 #ifndef _BASE_HOLOMORPHIC_FORM_H_
 #define _BASE_HOLOMORPHIC_FORM_H_
 
+#include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 #include <list>
@@ -133,7 +134,15 @@ template <typename M> double CWedgeOperator<M>::wedge_product()
             du1.push_back(du);
         }
 
-        // insert your code here to compute p from du0[3], du1[3];
+        // cross product
+        double p_ = 0;
+        for (size_t i = 0; i < 3; i++)
+        {
+            p_ += du0[i] * du1[(i - 1) % 3] - du0[i] * du1[(i + 1) % 3];
+        }
+
+        // wedge product on the face
+        p += p_ / 6;
     }
     return p;
 };
@@ -195,7 +204,13 @@ template <typename M> double CWedgeOperator<M>::wedge_star_product()
             du1.push_back(du);
         }
 
-        // insert your code here to compute p from du0[3], du1[3];
+        double p_ = 0;
+        for (size_t i = 0; i < 3; i++)
+        {
+            p_ += du0[i] * du1[i] * std::tan(M_PI_2 - theta[i]);
+        }
+
+        p += p_ / 2;
     }
     return p;
 };

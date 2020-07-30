@@ -173,6 +173,8 @@ void MeshLib::CHarmonicMap::map()
 
     for (int k = 0; k < 2; k++)
     {
+        std::cout << "solving for k=" << k << std::endl;
+
         Eigen::VectorXd b(boundary_vertices);
         // set boundary constraints vector b
         for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
