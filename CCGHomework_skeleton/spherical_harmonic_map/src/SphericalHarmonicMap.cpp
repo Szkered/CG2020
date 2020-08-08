@@ -1,3 +1,4 @@
+#include <cmath>
 #include <float.h>
 #include <math.h>
 
@@ -75,16 +76,33 @@ double MeshLib::CSphericalHarmonicMap::step_one(int steps, double step_length)
         for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
         {
             M::CVertex *pV = *viter;
-            // insert your code here
 
             // 1. compute vertex laplacian
+            CPoint laplacian(0, 0, 0);
+            for (M::VertexVertexIterator_ vviter(pV); !vviter.end(); vviter++)
+            {
+                M::CVertex *pW = *vviter;
+                M::CEdge *pE = m_pMesh->vertexEdge(pV, pW);
+                laplacian += (pW->u() - pV->u()) * pE->weight();
+            }
+
             // 2. get the noraml component
+            CPoint laplacian_normal = pV->u() * (laplacian * pV->u());
+
             // 3. get the tangent_component
+            CPoint laplacian_tangent = laplacian - laplacian_normal;
+
             // 4. update u
+            pV->u() += laplacian_tangent * step_length;
+
             // 5. normalize the vertex->u() to the unit sphere
+            pV->u() /= pV->u().norm();
         }
     }
+
     // 6. normalize the mapping, such that mass center is at the origin
+    _normalize();
+
     // 7. compute the harmonic energy
     double E = _calculate_harmonic_energy();
     std::cout << "After " << steps << " steps, harmonic energy is " << E << std::endl;
@@ -198,6 +216,20 @@ void MeshLib::CSphericalHarmonicMap::_normalize()
     CPoint center(0, 0, 0);
     double area = 0;
 
-    // insert your code here
     // move the mass center of vertex->u() to the origin
+    for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
+    {
+        M::CVertex *pV = *viter;
+        double A = pV->area();
+        center += pV->u() * A;
+        area += A;
+    }
+    center /= area;
+
+    for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
+    {
+        M::CVertex *pV = *viter;
+        pV->u() = pV->u() - center;
+        pV->u() /= pV->u().norm();
+    }
 }

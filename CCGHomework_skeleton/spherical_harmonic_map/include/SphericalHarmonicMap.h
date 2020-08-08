@@ -37,7 +37,7 @@ class CSphericalHarmonicMap
      *  \param step step length
      *  \param epsilon error threshold
      */
-    void map(double step_length = 5e-1, double epsilon = 1e-3);
+    void map(double step_length = 0.05, double epsilon = 1e-3);
     /*
      *   normalize the mapping
      */
