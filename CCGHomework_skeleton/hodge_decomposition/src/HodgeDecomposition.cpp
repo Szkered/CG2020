@@ -478,11 +478,14 @@ void MeshLib::CHodgeDecomposition::random_harmonic_form()
 {
     _random_form();
 
-    _calculate_edge_weight(false); // TODO: why?
+    // don't need to use actual weight here as closedness is a topological invariant
+    _calculate_edge_weight(false);
     _compute_coexact_form();
     _remove_coexact_form();
     _test_closedness();
 
+    // need to use actual weight here as coclosedness depends on the riemannian measure
+    // as coderivative operator uses hodge operator, which needs measure
     _calculate_edge_weight(true);
     _compute_exact_form();
     _remove_exact_form();
