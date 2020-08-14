@@ -31,7 +31,7 @@ namespace MeshLib
 class CDomainOptimalTransport : public CBaseOT, public CDetri2Mesh
 {
   public:
-    CDomainOptimalTransport(COMTMesh* pMesh);
+    CDomainOptimalTransport(COMTMesh *pMesh);
 
     ~CDomainOptimalTransport();
 
@@ -40,29 +40,35 @@ class CDomainOptimalTransport : public CBaseOT, public CDetri2Mesh
     void _initialize();
     /*! gradient descend
      */
-    void __gradient_descend(COMTMesh* pInput, COMTMesh*& pOutput);
+    void __gradient_descend(COMTMesh *pInput, COMTMesh *&pOutput);
 
     /*! Newton's method
      */
-    void __newton(COMTMesh* pInput, COMTMesh*& pOutput);
+    void __newton(COMTMesh *pInput, COMTMesh *&pOutput);
 
     /* data members */
   public:
     // Weighted Delaunay Mesh
-    COMTMesh*& pWeightedDT() { return m_pWDT; };
+    COMTMesh *&pWeightedDT()
+    {
+        return m_pWDT;
+    };
 
     // base mesh
-    COMTMesh*& PMesh() { return m_pMesh; };
+    COMTMesh *&PMesh()
+    {
+        return m_pMesh;
+    };
 
   protected:
     // triangle mesh for the Weighted Delaunay Triangulation
-    COMTMesh* m_pWDT = NULL;
+    COMTMesh *m_pWDT = NULL;
 
     // triangulation for the background domain
-    detri2::Triangulation* m_domainTr = NULL;
+    detri2::Triangulation *m_domainTr = NULL;
 
     // triangulation for the Weighted Delaunay
-    detri2::Triangulation* m_outputTr = NULL;
+    detri2::Triangulation *m_outputTr = NULL;
 };
 
 } // namespace MeshLib

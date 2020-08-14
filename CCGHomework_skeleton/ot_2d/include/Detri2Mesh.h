@@ -139,7 +139,7 @@ inline void CDetri2Mesh::__detri2_generate_disk(detri2::Triangulation *&domainTr
 /*
         convert weighted Delaunay triangulation, power diagram to a mesh
         with edge length, dual length
-        vertex dual cell, dual center, and dual celll area
+        vertex dual cell, dual center, and dual cell area
 */
 inline void CDetri2Mesh::__detri2_to_mesh(detri2::Triangulation *outputTr, detri2::Triangulation *domainTr,
                                           COMTMesh *&pWDT)
