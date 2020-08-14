@@ -73,9 +73,9 @@ void CDomainOptimalTransport::__gradient_descend(
     for (COMTMesh::MeshVertexIterator viter(pInput); !viter.end(); viter++)
     {
         COMTMesh::CVertex *pv = *viter;
-        // insert your code here
         // to compute the gradient
-        double grad = 0.0;
+        double grad = -(pv->target_area() - pv->dual_area());
+        // double grad = pv->target_area() - pv->dual_area();
         pv->update_direction() = grad;
     }
 
@@ -169,10 +169,15 @@ void CDomainOptimalTransport::__newton(
 
         if (!success)
         {
-            // insert your code here
             // if there are missing points,
             // roll back the vertex weight
             // reduce the step length by half
+            for (COMTMesh::MeshVertexIterator viter(pInput); !viter.end(); viter++)
+            {
+                COMTMesh::CVertex *pv = *viter;
+                pv->weight() += step_length * pv->update_direction();
+            }
+            step_length /= 2.0;
 
             delete pTr;
             pTr = NULL;

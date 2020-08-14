@@ -29,8 +29,8 @@ else(MSVC)
 endif(MSVC)
 
 
-add_subdirectory("cutgraph")
-add_subdirectory("harmonic_map")
-add_subdirectory("hodge_decomposition")
-add_subdirectory("spherical_harmonic_map")
+# add_subdirectory("cutgraph")
+# add_subdirectory("harmonic_map")
+# add_subdirectory("hodge_decomposition")
+# add_subdirectory("spherical_harmonic_map")
 add_subdirectory("ot_2d")

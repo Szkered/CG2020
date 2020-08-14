@@ -160,7 +160,7 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
     {
         COMTMesh::CVertex *pv = *viter;
         // compute the gradient for each vertex
-        double gradient = pv->target_area() - pv->weight();
+        double gradient = -(pv->target_area() - pv->dual_area());
         m_gradient[pv->index()] = gradient;
     }
 
@@ -220,9 +220,8 @@ void CBaseOT::__compute_hessian_matrix(COMTMesh &mesh, Eigen::SparseMatrix<doubl
     for (COMTMesh::MeshEdgeIterator eiter(&mesh); !eiter.end(); eiter++)
     {
         COMTMesh::CEdge *pe = *eiter;
-        // insert your coder here
         // compute the off diagonal element in Hessian matrix
-        double weight = 1.0;
+        double weight = -1.0 * pe->dual_length() / pe->length();
         COMTMesh::CVertex *pv1 = mesh.edgeVertex1(pe);
         COMTMesh::CVertex *pv2 = mesh.edgeVertex2(pe);
         int ids = pv1->index();
@@ -238,9 +237,8 @@ void CBaseOT::__compute_hessian_matrix(COMTMesh &mesh, Eigen::SparseMatrix<doubl
         for (COMTMesh::VertexEdgeIterator veiter(pv); !veiter.end(); veiter++)
         {
             COMTMesh::CEdge *pe = *veiter;
-            // insert your code here
             // compute the diagonal element in Hessian matrix
-            double weight = 1.0;
+            double weight = -1.0 * pe->dual_length() / pe->length();
             sum += weight;
         }
         int id = pv->index();

@@ -46,7 +46,7 @@ class COMTVertex : public CVertex
     /*! dual cell in 3D*/
     CPolygon3D m_dual_cell;
 
-    /*! duall cell center */
+    /*! dual cell center */
     CPoint m_dual_center;
 
     /*! update direction */

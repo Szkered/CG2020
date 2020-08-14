@@ -37,7 +37,8 @@ class CEdge
     /*!
         CEdge destructor.
     */
-    virtual ~CEdge(){};
+    // virtual ~CEdge(){};  // NOTE : this is needed for harmonic map but somehow breaks hw5
+    ~CEdge(){};
     /*!
         Edge ID
      */
