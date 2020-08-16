@@ -2,6 +2,7 @@
 #define _SPHERICAL_HARMONIC_MAP_H_
 
 #include "SphericalHarmonicMapMesh.h"
+#include <vector>
 
 namespace MeshLib
 {
@@ -34,10 +35,10 @@ class CSphericalHarmonicMap
 
     /*!
      *  The spherical harmonic map
-     *  \param step step length
+     *  \param step step length NOTE: step_length: 0.01 for bimba, 0.05 for brain
      *  \param epsilon error threshold
      */
-    void map(double step_length = 0.05, double epsilon = 1e-3);
+    void map(double step_length = 0.01, double epsilon = 1e-3);
     /*
      *   normalize the mapping
      */
@@ -74,6 +75,8 @@ class CSphericalHarmonicMap
      * The input surface mesh
      */
     CSHMMesh *m_pMesh;
+    std::vector<CSHMMesh::CVertex *> V;
+    std::vector<CSHMMesh::CEdge *> E;
 };
 } // namespace MeshLib
 #endif // !_SPHERICAL_HARMONIC_MAP_H_

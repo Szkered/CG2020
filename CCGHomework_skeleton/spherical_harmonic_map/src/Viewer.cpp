@@ -1,4 +1,5 @@
 #include <math.h>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -445,6 +446,9 @@ void initOpenGL(int argc, char *argv[])
  */
 int main(int argc, char *argv[])
 {
+
+    omp_set_num_threads(12);
+
     if (argc < 2)
     {
         printf("Usage: %s input.m\n", argv[0]);

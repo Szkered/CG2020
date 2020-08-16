@@ -1,12 +1,20 @@
 #include <cmath>
 #include <float.h>
 #include <math.h>
+#include <omp.h>
+#include <vector>
 
 #include "SphericalHarmonicMap.h"
 
 void MeshLib::CSphericalHarmonicMap::set_mesh(CSHMMesh *pMesh)
 {
     m_pMesh = pMesh;
+
+    auto v_list = m_pMesh->vertices();
+    V = std::vector<CSHMMesh::CVertex *>(v_list.begin(), v_list.end());
+
+    auto e_list = m_pMesh->edges();
+    E = std::vector<CSHMMesh::CEdge *>(e_list.begin(), e_list.end());
 
     // 1. compute vertex normal
     _calculate_normal();
@@ -73,9 +81,15 @@ double MeshLib::CSphericalHarmonicMap::step_one(int steps, double step_length)
 
     for (int i = 0; i < steps; ++i)
     {
-        for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
+
+#pragma omp parallel for
+        for (int i = 0; i < V.size(); ++i)
         {
-            M::CVertex *pV = *viter;
+            M::CVertex *pV = V.at(i);
+
+            // for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
+            // {
+            // M::CVertex *pV = *viter;
 
             // 1. compute vertex laplacian
             CPoint laplacian(0, 0, 0);
@@ -191,6 +205,17 @@ double MeshLib::CSphericalHarmonicMap::_calculate_harmonic_energy()
     using M = CSHMMesh;
 
     double energy = 0;
+
+    // #pragma omp parallel for
+    //     for (int i = 0; i < E.size(); ++i)
+    //     {
+    //         M::CEdge *pE = E.at(i);
+    //         M::CVertex *pV = m_pMesh->edgeVertex1(pE);
+    //         M::CVertex *pW = m_pMesh->edgeVertex2(pE);
+    //         CPoint d = pV->u() - pW->u();
+    //         energy += pE->weight() * (d * d);
+    //     }
+
     for (M::MeshEdgeIterator_ eiter(m_pMesh); !eiter.end(); ++eiter)
     {
         M::CEdge *pE = *eiter;
@@ -199,6 +224,7 @@ double MeshLib::CSphericalHarmonicMap::_calculate_harmonic_energy()
         CPoint d = pV->u() - pW->u();
         energy += pE->weight() * (d * d);
     }
+
     return energy;
 }
 
@@ -217,6 +243,16 @@ void MeshLib::CSphericalHarmonicMap::_normalize()
     double area = 0;
 
     // move the mass center of vertex->u() to the origin
+
+    // #pragma omp parallel for
+    //     for (int i = 0; i < V.size(); ++i)
+    //     {
+    //         M::CVertex *pV = V.at(i);
+    //         double A = pV->area();
+    //         center += pV->u() * A;
+    //         area += A;
+    //     }
+
     for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
     {
         M::CVertex *pV = *viter;
@@ -224,7 +260,16 @@ void MeshLib::CSphericalHarmonicMap::_normalize()
         center += pV->u() * A;
         area += A;
     }
+
     center /= area;
+
+    // #pragma omp parallel for
+    //     for (int i = 0; i < V.size(); ++i)
+    //     {
+    //         M::CVertex *pV = V.at(i);
+    //         pV->u() = pV->u() - center;
+    //         pV->u() /= pV->u().norm();
+    //     }
 
     for (M::MeshVertexIterator_ viter(m_pMesh); !viter.end(); ++viter)
     {
