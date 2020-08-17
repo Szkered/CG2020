@@ -42,6 +42,7 @@
  *
  *******************************************************************************/
 
+#include <omp.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -105,7 +106,8 @@ void setupEye(void)
 /*! setup light */
 void setupLight()
 {
-    CQrot v(0, 0, 0, 1);
+    // CQrot v(0, 0, 0, 1);
+    CQrot v(0, 0, 0, -1); // for mnist only
     CQrot CL(LightRot.m_w, -LightRot.m_x, -LightRot.m_y, -LightRot.m_z);
     CL = LightRot * v * CL;
 
@@ -136,7 +138,8 @@ void draw_voronoi_cell(COMTMesh *pMesh)
                 CSegment3D &s = pg.edges()[i];
                 CPoint p = s.start();
                 CPoint q = s.end();
-                glColor3f(1, 0, 0);
+                glColor3f(0.5, 0.5, 0.5);
+                // glColor3f(1, 0, 0); // red cell boundary
                 glVertex3d(p[0], p[1], -2e-3);
                 glVertex3d(q[0], q[1], -2e-3);
             }
@@ -274,6 +277,16 @@ void key_process(unsigned char key)
 {
     switch (key)
     {
+    case 'm': {
+        COMTMesh *wdt_mesh = pOT->pWeightedDT();
+        for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
+        {
+            COMTMesh::CVertex *pv = *viter;
+            pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
+        }
+        wdt_mesh->write_m("output.m");
+    }
+    break;
     case 'f':
         // Flat Shading
         glPolygonMode(GL_FRONT, GL_FILL);
@@ -453,6 +466,9 @@ void process_key(char *keys)
  */
 int main(int argc, char *argv[])
 {
+
+    omp_set_num_threads(12);
+
     if (argc < 2)
     {
         printf("Usage: %s mesh_name\n", argv[0]);
@@ -478,9 +494,18 @@ int main(int argc, char *argv[])
         pS._set_vertex_default_color();
     }
 
+    bool uniform = false;
+    if (argc > 2)
+    {
+        std::string uniform_str(argv[2]);
+        uniform = uniform_str == "uniform";
+    }
+
+    std::cout << "uniform: " << uniform << std::endl;
+
     {
         pOT = new CDomainOptimalTransport(&mesh);
-        pOT->_initialize();
+        pOT->_initialize(uniform);
     }
 
     /* glut stuff */

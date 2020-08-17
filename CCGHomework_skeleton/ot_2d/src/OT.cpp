@@ -23,6 +23,10 @@ void CBaseOT::_copy_mesh(COMTMesh *pInput, COMTMesh *pOutput)
         pw->rgb() = pv->rgb();
         pw->normal() = pv->normal();
         pw->string() = pv->string();
+        // pw->point() = CPoint(pw->dual_center()[0], pw->dual_center()[1], pw->weight());
+        pw->point() = CPoint(pw->dual_center()[0], pw->dual_center()[1], pw->dual_cell().mass_center()[2]);
+        // pw->point() = CPoint(pw->uv()[0]);
+        // pw->uv() = CPoint2(pw->dual_center()[0], pw->dual_center()[1]);
     }
 }
 
@@ -156,13 +160,22 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
     Eigen::VectorXd m_gradient;
     m_gradient.resize(m_pMesh->numVertices());
 
-    for (COMTMesh::MeshVertexIterator viter(m_pMesh); !viter.end(); viter++)
+#pragma omp parallel for
+    for (int i = 0; i < m_pMesh->numVertices(); ++i)
     {
-        COMTMesh::CVertex *pv = *viter;
-        // compute the gradient for each vertex
-        double gradient = -(pv->target_area() - pv->dual_area());
-        m_gradient[pv->index()] = gradient;
+        int id = ids[i];
+        COMTMesh::CVertex *pv = m_pMesh->idVertex(id);
+        double grad = -(pv->target_area() - pv->dual_area());
+        m_gradient[pv->index()] = grad;
     }
+
+    // for (COMTMesh::MeshVertexIterator viter(m_pMesh); !viter.end(); viter++)
+    // {
+    //     COMTMesh::CVertex *pv = *viter;
+    //     // compute the gradient for each vertex
+    //     double gradient = -(pv->target_area() - pv->dual_area());
+    //     m_gradient[pv->index()] = gradient;
+    // }
 
     /* compute the Hessian matrix */
     Eigen::SparseMatrix<double> hessian;
@@ -176,6 +189,7 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
     }
     else
     {
+#pragma omp parallel for
         for (int i = 0; i < m_pMesh->numVertices(); i++)
         {
             int id = ids[i];
@@ -187,27 +201,38 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
 
 /*! set target area, assume the vertex area has been set already */
 
-void CBaseOT::_set_target_measure(COMTMesh *&pMesh, double total_target_area)
+void CBaseOT::_set_target_measure(COMTMesh *&pMesh, double total_target_area, bool uniform)
 {
-    double total_area = 0;
-    /* compute the vertex area */
-    for (COMTMesh::MeshVertexIterator viter(pMesh); !viter.end(); viter++)
+    if (not uniform)
     {
-        COMTMesh::CVertex *pV = *viter;
-        double s = 0;
-        for (COMTMesh::VertexFaceIterator vfiter(pV); !vfiter.end(); vfiter++)
+        double total_area = 0;
+        /* compute the vertex area */
+        for (COMTMesh::MeshVertexIterator viter(pMesh); !viter.end(); viter++)
         {
-            COMTMesh::CFace *pF = *vfiter;
-            s += pF->area();
+            COMTMesh::CVertex *pV = *viter;
+            double s = 0;
+            for (COMTMesh::VertexFaceIterator vfiter(pV); !vfiter.end(); vfiter++)
+            {
+                COMTMesh::CFace *pF = *vfiter;
+                s += pF->area();
+            }
+            pV->target_area() = s / 3.0;
+            total_area += pV->target_area();
         }
-        pV->target_area() = s / 3.0;
-        total_area += pV->target_area();
+        /*! set the target area proportional to the vertex area*/
+        for (COMTMesh::MeshVertexIterator viter(pMesh); !viter.end(); viter++)
+        {
+            COMTMesh::CVertex *pV = *viter;
+            pV->target_area() *= (total_target_area / total_area);
+        }
     }
-    /*! set the target area proportional to the vertex area*/
-    for (COMTMesh::MeshVertexIterator viter(pMesh); !viter.end(); viter++)
+    else
     {
-        COMTMesh::CVertex *pV = *viter;
-        pV->target_area() *= (total_target_area / total_area);
+        for (COMTMesh::MeshVertexIterator viter(pMesh); !viter.end(); viter++)
+        {
+            COMTMesh::CVertex *pV = *viter;
+            pV->target_area() = total_target_area / 70000;
+        }
     }
 };
 

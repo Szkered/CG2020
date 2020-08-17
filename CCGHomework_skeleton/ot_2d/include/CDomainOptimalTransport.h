@@ -11,6 +11,7 @@
 
 #include "Detri2Mesh.h"
 #include "OT.h"
+#include "OTMesh.h"
 
 namespace MeshLib
 {
@@ -37,7 +38,7 @@ class CDomainOptimalTransport : public CBaseOT, public CDetri2Mesh
 
     /*! initialize the potential function as quadratic
      */
-    void _initialize();
+    void _initialize(bool uniform);
     /*! gradient descend
      */
     void __gradient_descend(COMTMesh *pInput, COMTMesh *&pOutput);
@@ -63,6 +64,8 @@ class CDomainOptimalTransport : public CBaseOT, public CDetri2Mesh
   protected:
     // triangle mesh for the Weighted Delaunay Triangulation
     COMTMesh *m_pWDT = NULL;
+
+    double total_target_area = 0.0;
 
     // triangulation for the background domain
     detri2::Triangulation *m_domainTr = NULL;

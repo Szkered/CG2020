@@ -4,10 +4,9 @@ cmake_minimum_required(VERSION 3.6)
 project(CCGHomework)
 
 if(NOT MSVC)
-  # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -pthread -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
   # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -std=c++17 -pthread -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -std=c++17 -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
-  # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17 -pthread -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
+  # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fpermissive -std=c++17 -lGL -lGLU -lglut -lX11 -lXxf86vm -lXext -lXrandr -lXt -lXi")
 endif(NOT MSVC)
 
 # Find MeshLib
@@ -39,5 +38,5 @@ set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS
 # add_subdirectory("cutgraph")
 # add_subdirectory("harmonic_map")
 # add_subdirectory("hodge_decomposition")
-add_subdirectory("spherical_harmonic_map")
+# add_subdirectory("spherical_harmonic_map")
 add_subdirectory("ot_2d")

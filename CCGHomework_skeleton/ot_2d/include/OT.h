@@ -34,6 +34,14 @@ class CBaseOT
     CBaseOT(COMTMesh *pMesh)
     {
         m_pMesh = pMesh;
+
+        ids.resize(m_pMesh->numVertices());
+
+        auto v_list = m_pMesh->vertices();
+        V = std::vector<COMTMesh::CVertex *>(v_list.begin(), v_list.end());
+
+        auto e_list = m_pMesh->edges();
+        E = std::vector<COMTMesh::CEdge *>(e_list.begin(), e_list.end());
     };
     ~CBaseOT(){};
 
@@ -43,7 +51,7 @@ class CBaseOT
     /*! compute the maximal relative error */
     virtual void _compute_error(COMTMesh *pMesh);
     /*! set target are */
-    virtual void _set_target_measure(COMTMesh *&pMesh, double total_target_area = PI);
+    virtual void _set_target_measure(COMTMesh *&pMesh, double total_target_area = PI, bool uniform = false);
     /*! initialize the mapping, idendity*/
     virtual void _initialize(COMTMesh *pChull){};
     /*! copy different attributes from input mesh to the output mesh */
@@ -59,6 +67,10 @@ class CBaseOT
     bool __solve(Eigen::SparseMatrix<double> &A, Eigen::VectorXd &b, Eigen::VectorXd &result);
     /*! reindex all the vertices, starting from zero */
     void index(COMTMesh *pMesh);
+    // list of vertex ids for random access
+    std::vector<int> ids;
+    std::vector<COMTMesh::CVertex *> V;
+    std::vector<COMTMesh::CEdge *> E;
 };
 
 }; // namespace MeshLib

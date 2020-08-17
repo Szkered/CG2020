@@ -9,6 +9,7 @@
 #include <Eigen/Eigen>
 
 #include "CDomainOptimalTransport.h"
+#include "OTMesh.h"
 
 namespace MeshLib
 {
@@ -26,20 +27,30 @@ CDomainOptimalTransport ::~CDomainOptimalTransport()
 }
 
 /* initialize the potential function as quadratic
+   void CDomainOptimalTransport::set_target_measure_to_uniform()
+
+   {
+   std::cout << "setting target measure to 1/n" << std::endl;
+   _set_target_measure(m_pMesh, total_target_area, true);
+   }
  */
-void CDomainOptimalTransport::_initialize()
+void CDomainOptimalTransport::_initialize(bool uniform)
 {
-    /* Total target area */
-    double total_target_area;
 
     /*! compute the domain triangulation, a convex polygon */
     __detri2_generate_disk(m_domainTr, total_target_area);
 
     /*! set the target measure */
-    _set_target_measure(m_pMesh, total_target_area);
+    _set_target_measure(m_pMesh, total_target_area, uniform);
 
     /*! initialize the vertex index, starting from zero */
     index(m_pMesh);
+
+    for (COMTMesh::MeshVertexIterator viter(m_pMesh); !viter.end(); viter++)
+    {
+        COMTMesh::CVertex *pv = *viter;
+        ids[pv->index()] = pv->id();
+    }
 
     /* initialize the vertex weight */
     for (COMTMesh::MeshVertexIterator viter(m_pMesh); !viter.end(); viter++)
@@ -69,6 +80,19 @@ void CDomainOptimalTransport::__gradient_descend(
                        // set, the connectivity is updated
 )
 {
+
+    // #pragma omp parallel for
+    //     for (int i = 0; i < V.size(); ++i)
+    //     {
+    //         COMTMesh::CVertex *pv = V.at(i);
+    //         // for (int i = 0; i < m_pMesh->numVertices(); ++i)
+    //         // {
+    //         //     int id = ids[i];
+    //         //     COMTMesh::CVertex *pv = m_pMesh->idVertex(id);
+    //         double grad = -(pv->target_area() - pv->dual_area());
+    //         pv->update_direction() = grad;
+    //     }
+
     /*! compute the gradient, which equals to (target_area - dual_area) */
     for (COMTMesh::MeshVertexIterator viter(pInput); !viter.end(); viter++)
     {
@@ -89,6 +113,18 @@ void CDomainOptimalTransport::__gradient_descend(
     /*! damping iteration */
     while (true)
     {
+
+        // #pragma omp parallel for
+        //         for (int i = 0; i < V.size(); ++i)
+        //         {
+        //             COMTMesh::CVertex *pv = V.at(i);
+        //             // for (int i = 0; i < m_pMesh->numVertices(); ++i)
+        //             // {
+        //             //     int id = ids[i];
+        //             //     COMTMesh::CVertex *pv = m_pMesh->idVertex(id);
+        //             pv->weight() -= step_length * pv->update_direction();
+        //         }
+
         // update the vertex weight
         for (COMTMesh::MeshVertexIterator viter(pInput); !viter.end(); viter++)
         {
@@ -99,6 +135,18 @@ void CDomainOptimalTransport::__gradient_descend(
         // compute Weighted Delaunay Triangulation
         if (!__detri2_WDT(pInput, &pTr))
         {
+
+            // #pragma omp parallel for
+            //             for (int i = 0; i < V.size(); ++i)
+            //             {
+            //                 COMTMesh::CVertex *pv = V.at(i);
+            //                 // for (int i = 0; i < m_pMesh->numVertices(); ++i)
+            //                 // {
+            //                 //     int id = ids[i];
+            //                 //     COMTMesh::CVertex *pv = m_pMesh->idVertex(id);
+            //                 pv->weight() += step_length * pv->update_direction();
+            //             }
+
             // if there are missing points,
             // roll back the vertex weight
             for (COMTMesh::MeshVertexIterator viter(pInput); !viter.end(); viter++)
@@ -106,6 +154,7 @@ void CDomainOptimalTransport::__gradient_descend(
                 COMTMesh::CVertex *pv = *viter;
                 pv->weight() += step_length * pv->update_direction();
             }
+
             delete pTr;
             pTr = NULL;
             // reduce the step length by half
@@ -157,6 +206,7 @@ void CDomainOptimalTransport::__newton(
     /*! damping iteration */
     while (true)
     {
+
         // update the vertex weight
         for (COMTMesh::MeshVertexIterator viter(pInput); !viter.end(); viter++)
         {
@@ -177,6 +227,7 @@ void CDomainOptimalTransport::__newton(
                 COMTMesh::CVertex *pv = *viter;
                 pv->weight() += step_length * pv->update_direction();
             }
+
             step_length /= 2.0;
 
             delete pTr;
@@ -190,7 +241,7 @@ void CDomainOptimalTransport::__newton(
         // this will set the vertex->dual_area, vertex->dual_cell, vertex->dual_center;
         // edge->length, edge->dual_length;
         __detri2_to_mesh(pTr, m_domainTr, pMesh);
-        // copy vertex->target_carea, vertex->weight, vertex->index from the input mesh
+        // copy vertex->target_area, vertex->weight, vertex->index from the input mesh
         // to the newly generated WDT mesh
         _copy_mesh(pInput, pMesh);
 
