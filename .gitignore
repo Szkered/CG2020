@@ -10,3 +10,4 @@ tmp/
 *CMakeCache.txt
 *compile_commands.json
 /CCGHomework_skeleton/bin/
+/CCGHomework_skeleton/.vscode/

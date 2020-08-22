@@ -40,3 +40,4 @@ set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS
 # add_subdirectory("hodge_decomposition")
 # add_subdirectory("spherical_harmonic_map")
 add_subdirectory("ot_2d")
+add_subdirectory("KoebeIteration")
