@@ -23,10 +23,11 @@ void CBaseOT::_copy_mesh(COMTMesh *pInput, COMTMesh *pOutput)
         pw->rgb() = pv->rgb();
         pw->normal() = pv->normal();
         pw->string() = pv->string();
-        // pw->point() = CPoint(pw->dual_center()[0], pw->dual_center()[1], pw->weight());
-        pw->point() = CPoint(pw->dual_center()[0], pw->dual_center()[1], pw->dual_cell().mass_center()[2]);
-        // pw->point() = CPoint(pw->uv()[0]);
-        // pw->uv() = CPoint2(pw->dual_center()[0], pw->dual_center()[1]);
+        double x = pw->dual_center()[0];
+        double y = pw->dual_center()[1];
+        double z = pw->weight();
+        pw->point() = CPoint(x, y, z);
+        // pw->point() = CPoint(x, y, z + 0.5 * (x * x + y * y));
     }
 }
 
@@ -159,6 +160,7 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
 
     Eigen::VectorXd m_gradient;
     m_gradient.resize(m_pMesh->numVertices());
+    // m_gradient.resize(m_pMesh->numVertices() + 1);
 
 #pragma omp parallel for
     for (int i = 0; i < m_pMesh->numVertices(); ++i)
@@ -168,6 +170,7 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
         double grad = -(pv->target_area() - pv->dual_area());
         m_gradient[pv->index()] = grad;
     }
+    // m_gradient[m_pMesh->numVertices()] = 0;
 
     // for (COMTMesh::MeshVertexIterator viter(m_pMesh); !viter.end(); viter++)
     // {
@@ -189,6 +192,7 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
     }
     else
     {
+        // m_direction.normalize();
 #pragma omp parallel for
         for (int i = 0; i < m_pMesh->numVertices(); i++)
         {
@@ -228,10 +232,11 @@ void CBaseOT::_set_target_measure(COMTMesh *&pMesh, double total_target_area, bo
     }
     else
     {
+        std::cout << "setting target measure to uniform" << std::endl;
         for (COMTMesh::MeshVertexIterator viter(pMesh); !viter.end(); viter++)
         {
             COMTMesh::CVertex *pV = *viter;
-            pV->target_area() = total_target_area / 70000;
+            pV->target_area() = total_target_area / pMesh->numVertices();
         }
     }
 };
@@ -269,6 +274,14 @@ void CBaseOT::__compute_hessian_matrix(COMTMesh &mesh, Eigen::SparseMatrix<doubl
         int id = pv->index();
         hessian_coefficients.push_back(Eigen::Triplet<double>(id, id, -sum));
     }
+
+    // // heights should add up to zero
+    // for (int i = 0; i < mesh.numVertices() - 1; i++)
+    //     hessian_coefficients.push_back(Eigen::Triplet<double>(mesh.numVertices(), i, 1));
+
+    // hessian_coefficients.push_back(Eigen::Triplet<double>(mesh.numVertices(), mesh.numVertices() - 1, 0));
+
+    // hessian.resize(mesh.numVertices() + 1, mesh.numVertices() + 1);
 
     hessian.resize(mesh.numVertices(), mesh.numVertices());
     hessian.setZero();

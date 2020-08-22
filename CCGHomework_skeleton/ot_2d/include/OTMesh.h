@@ -18,6 +18,7 @@
 #include "Parser/parser.h"
 #include "Parser/traits_io.h"
 #include "Geometry/Polygon3D.h"
+#include <string>
 
 namespace MeshLib
 {
@@ -92,6 +93,10 @@ class COMTVertex : public CVertex
         return m_dual_area;
     };
 
+    /*! Convert vertex traits to string.
+     */
+    void _to_string();
+
     /*! read vertex rgb, uv from vertex string */
     void _from_string();
 
@@ -149,6 +154,14 @@ inline void COMTVertex::_from_string()
     }
 };
 
+inline void COMTVertex::_to_string()
+{
+    std::string uv_str = "uv=(" + std::to_string(m_uv[0]) + " " + std::to_string(m_uv[1]) + ")";
+    std::string rgb_str =
+        "rgb=(" + std::to_string(m_rgb[0]) + " " + std::to_string(m_rgb[1]) + " " + std::to_string(m_rgb[2]) + ")";
+    m_string = uv_str + " " + rgb_str;
+}
+
 /*! \brief COMTEdge class
  *
  *   Edge class for optimal transport
@@ -169,6 +182,12 @@ class COMTEdge : public CEdge
     {
     }
 
+    /*! Sharp edge */
+    bool &sharp()
+    {
+        return m_sharp;
+    };
+
     /*! edge length */
     double &length()
     {
@@ -180,6 +199,10 @@ class COMTEdge : public CEdge
     {
         return m_dual_length;
     };
+
+  protected:
+    /*! Sharp edge */
+    bool m_sharp;
 };
 
 /*! \brief CMOTFace class

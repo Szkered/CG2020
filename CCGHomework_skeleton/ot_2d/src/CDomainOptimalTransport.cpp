@@ -9,6 +9,11 @@
 #include <Eigen/Eigen>
 
 #include "CDomainOptimalTransport.h"
+#include "Geometry/Point.h"
+#include "Mesh/Edge.h"
+#include "Mesh/Face.h"
+#include "Mesh/HalfEdge.h"
+#include "Mesh/Vertex.h"
 #include "OTMesh.h"
 
 namespace MeshLib
@@ -26,14 +31,40 @@ CDomainOptimalTransport ::~CDomainOptimalTransport()
     delete m_outputTr;
 }
 
-/* initialize the potential function as quadratic
-   void CDomainOptimalTransport::set_target_measure_to_uniform()
+// initialize the potential function as quadratic
+void CDomainOptimalTransport::set_target_measure_to_uniform()
 
-   {
-   std::cout << "setting target measure to 1/n" << std::endl;
-   _set_target_measure(m_pMesh, total_target_area, true);
-   }
- */
+{
+    std::cout << "setting target measure to 1/n" << std::endl;
+    _set_target_measure(m_pMesh, total_target_area, true);
+}
+
+void CDomainOptimalTransport::find_singularities(COMTMesh *pInput)
+{
+    // Mark all sharp flags false
+    for (COMTMesh::MeshEdgeIterator eiter(pInput); !eiter.end(); ++eiter)
+    {
+        COMTEdge *pE = *eiter;
+        pE->sharp() = false;
+    }
+
+    double threshold = 0.01;
+    std::cout << "finding singualrities with threshold " << threshold << std::endl;
+    for (COMTMesh::MeshEdgeIterator eiter(pInput); !eiter.end(); ++eiter)
+    {
+        COMTEdge *pE = *eiter;
+
+        // CVertex v1 = pInput->edgeVertex1(pE);
+        // CVertex v2 = pInput->edgeVertex1(pE);
+
+        CPoint n1 = pInput->edgeVertex1(pE)->normal();
+        CPoint n2 = pInput->edgeVertex2(pE)->normal();
+        double cos_theta = (n1 * n2) / (n1.norm() * n2.norm());
+        if (1 - cos_theta > threshold)
+            pE->sharp() = true;
+    }
+}
+
 void CDomainOptimalTransport::_initialize(bool uniform)
 {
 
@@ -99,7 +130,6 @@ void CDomainOptimalTransport::__gradient_descend(
         COMTMesh::CVertex *pv = *viter;
         // to compute the gradient
         double grad = -(pv->target_area() - pv->dual_area());
-        // double grad = pv->target_area() - pv->dual_area();
         pv->update_direction() = grad;
     }
 

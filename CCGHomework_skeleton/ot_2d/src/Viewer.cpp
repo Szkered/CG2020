@@ -42,10 +42,15 @@
  *
  *******************************************************************************/
 
+#include "Geometry/Point.h"
+#include "OTMesh.h"
+#include <GL/gl.h>
+#include <cmath>
 #include <omp.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string_view>
 #include <time.h>
 
 #ifdef MAC_OS
@@ -67,6 +72,8 @@ int startx, starty;
 int texture_mode = 0;
 int display_mode = 0;
 int show_cell = 0;
+int show_height = 0;
+int show_singularity = 0;
 bool light_edit = false;
 // texture name
 GLuint texture_name;
@@ -140,8 +147,17 @@ void draw_voronoi_cell(COMTMesh *pMesh)
                 CPoint q = s.end();
                 glColor3f(0.5, 0.5, 0.5);
                 // glColor3f(1, 0, 0); // red cell boundary
-                glVertex3d(p[0], p[1], -2e-3);
-                glVertex3d(q[0], q[1], -2e-3);
+
+                if (show_height)
+                {
+                    glVertex3d(p[0], p[1], p[2]);
+                    glVertex3d(q[0], q[1], p[2]);
+                }
+                else
+                {
+                    glVertex3d(p[0], p[1], -2e-3);
+                    glVertex3d(q[0], q[1], -2e-3);
+                }
             }
         }
         glEnd();
@@ -150,6 +166,7 @@ void draw_voronoi_cell(COMTMesh *pMesh)
     glFrontFace(GL_CW);
     glEnable(GL_LIGHTING);
     glBegin(GL_TRIANGLES);
+
     for (COMTMesh::MeshVertexIterator viter(pMesh); !viter.end(); ++viter)
     {
         COMTMesh::CVertex *pV = *viter;
@@ -157,17 +174,44 @@ void draw_voronoi_cell(COMTMesh *pMesh)
         CPolygon3D &pg = pV->dual_cell();
         glNormal3f(pV->normal()[0], pV->normal()[1], pV->normal()[2]);
         glColor3f(pV->rgb()[0], pV->rgb()[1], pV->rgb()[2]);
+
+        if (show_height)
+            glBegin(GL_TRIANGLE_FAN);
+
         for (size_t i = 0; i < pg.edges().size(); i++)
         {
             CSegment3D &s = pg.edges()[i];
             CPoint p = s.start();
             CPoint q = s.end();
             CPoint r = pV->dual_center();
+            CPoint2 uv = pV->uv();
 
-            glVertex3f(r[0], r[1], 0);
-            glVertex3f(p[0], p[1], 0);
-            glVertex3f(q[0], q[1], 0);
+            if (show_height)
+            {
+                // auto get_z = [=](CPoint pt0, CPoint pt1) { return pt0[2] + 0.5 * (pt1[0] * pt1[0] + pt1[1] * pt1[1]);
+                // }; glVertex3f(r[0], r[1], get_z(r, r)); glVertex3f(p[0], p[1], get_z(r, p)); glVertex3f(q[0], q[1],
+                // get_z(r, q));
+
+                if (show_height == 1)
+                {
+                    glVertex3f(p[0], p[1], p[2]);
+                }
+                else
+                {
+                    // glVertex3f(p[0], p[1], p[2] + 0.5 * (p[0] * p[0] + p[1] * p[1]));
+                    glVertex3f(p[0], p[1], pV->weight() + 0.5 * uv.norm2());
+                }
+            }
+            else
+            {
+                glVertex3f(r[0], r[1], 0);
+                glVertex3f(p[0], p[1], 0);
+                glVertex3f(q[0], q[1], 0);
+            }
         }
+
+        if (show_height)
+            glEnd();
     }
     glEnd();
 }
@@ -175,25 +219,78 @@ void draw_voronoi_cell(COMTMesh *pMesh)
 void draw_weighted_delaunay(COMTMesh *pMesh)
 {
     glDisable(GL_LIGHTING);
-    glColor3f(0, 1, 0);
-    glLineWidth(1.0);
-    glBegin(GL_LINES);
 
-    for (COMTMesh::MeshEdgeIterator eiter(pMesh); !eiter.end(); ++eiter)
+    if (show_cell)
     {
-        COMTMesh::CEdge *pE = *eiter;
+        glColor3f(0, 1, 0);
+        glLineWidth(1.0);
+        glBegin(GL_LINES);
 
-        COMTMesh::CVertex *pV0 = pMesh->edgeVertex1(pE);
-        COMTMesh::CVertex *pV1 = pMesh->edgeVertex2(pE);
+        for (COMTMesh::MeshEdgeIterator eiter(pMesh); !eiter.end(); ++eiter)
+        {
+            COMTMesh::CEdge *pE = *eiter;
 
-        CPoint2 q0 = CPoint2(pV0->dual_center()[0], pV0->dual_center()[1]);
-        CPoint2 q1 = CPoint2(pV1->dual_center()[0], pV1->dual_center()[1]);
+            COMTMesh::CVertex *pV0 = pMesh->edgeVertex1(pE);
+            COMTMesh::CVertex *pV1 = pMesh->edgeVertex2(pE);
 
-        glVertex3d(q0[0], q0[1], 0);
-        glVertex3d(q1[0], q1[1], 0);
+            CPoint2 q0 = CPoint2(pV0->dual_center()[0], pV0->dual_center()[1]);
+            CPoint2 q1 = CPoint2(pV1->dual_center()[0], pV1->dual_center()[1]);
+
+            if (show_height)
+            {
+                // glVertex3d(q0[0], q0[1], pV0->weight());
+                // glVertex3d(q1[0], q1[1], pV1->weight());
+
+                glVertex3d(q0[0], q0[1], pV0->weight() + 0.5 * q0.norm2());
+                glVertex3d(q1[0], q1[1], pV1->weight() + 0.5 * q1.norm2());
+            }
+            else
+            {
+                glVertex3d(q0[0], q0[1], 0);
+                glVertex3d(q1[0], q1[1], 0);
+            }
+        }
+    }
+    else
+    {
+        glEnable(GL_LIGHTING);
+        glBegin(GL_TRIANGLES);
+        for (COMTMesh::MeshFaceIterator fiter(pMesh); !fiter.end(); ++fiter)
+        {
+            COMTMesh::CFace *pF = *fiter;
+
+            glNormal3f(pF->normal()[0], pF->normal()[1], pF->normal()[2]);
+            for (COMTMesh::FaceVertexIterator fviter(pF); !fviter.end(); ++fviter)
+            {
+                COMTMesh::CVertex *pV = *fviter;
+                CPoint p = pV->point();
+                glVertex3f(p[0], p[1], p[2]);
+            }
+        }
     }
     glEnd();
-    glEnable(GL_LIGHTING);
+}
+
+void drawSharpEdges()
+{
+    glDisable(GL_LIGHTING);
+
+    glLineWidth(2.);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glBegin(GL_LINES);
+    COMTMesh *wdt_mesh = pOT->pWeightedDT();
+    for (COMTMesh::MeshEdgeIterator eiter(wdt_mesh); !eiter.end(); ++eiter)
+    {
+        COMTEdge *pE = *eiter;
+        if (pE->sharp() == true)
+        {
+            CVertex *p0 = wdt_mesh->edgeVertex1(pE);
+            CVertex *p1 = wdt_mesh->edgeVertex2(pE);
+            glVertex3f(p0->point()[0], p0->point()[1], p0->point()[2]);
+            glVertex3f(p1->point()[0], p1->point()[1], p1->point()[2]);
+        }
+    }
+    glEnd();
 }
 
 /*! display call back function
@@ -208,6 +305,10 @@ void display()
     glPushMatrix();
     /* transform from the world to the ojbect coordinate system */
     setupObject();
+
+    if (show_singularity)
+        drawSharpEdges();
+
     /* draw the mesh */
     switch (display_mode)
     {
@@ -277,6 +378,10 @@ void key_process(unsigned char key)
 {
     switch (key)
     {
+
+    case 'c':
+        pOT->find_singularities(pOT->pWeightedDT());
+        break;
     case 'm': {
         COMTMesh *wdt_mesh = pOT->pWeightedDT();
         for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
@@ -284,7 +389,20 @@ void key_process(unsigned char key)
             COMTMesh::CVertex *pv = *viter;
             pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
         }
+        wdt_mesh->labelBoundary();
         wdt_mesh->write_m("output.m");
+    }
+    break;
+    case 'n': {
+        COMTMesh *wdt_mesh = pOT->pWeightedDT();
+        for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
+        {
+            COMTMesh::CVertex *pv = *viter;
+            pv->point() = CPoint(pv->uv()[0], pv->uv()[1], pv->weight());
+            // pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
+        }
+        wdt_mesh->labelBoundary();
+        wdt_mesh->write_m("final_output.m");
     }
     break;
     case 'f':
@@ -292,11 +410,11 @@ void key_process(unsigned char key)
         glPolygonMode(GL_FRONT, GL_FILL);
         // configure.m_shade_mode = 0;
         break;
-    case 's':
-        // Smooth Shading
-        glPolygonMode(GL_FRONT, GL_FILL);
-        // configure.m_shade_mode = 1;
-        break;
+    // case 's':
+    //     // Smooth Shading
+    //     glPolygonMode(GL_FRONT, GL_FILL);
+    //     // configure.m_shade_mode = 1;
+    //     break;
     case 'w':
         // Wireframe mode
         glPolygonMode(GL_FRONT, GL_LINE);
@@ -306,6 +424,12 @@ void key_process(unsigned char key)
         break;
     case 27:
         exit(0);
+        break;
+    case 's':
+        show_singularity = (show_singularity + 1) % 2;
+        break;
+    case 'h':
+        show_height = (show_height + 1) % 3;
         break;
     case 'g':
         display_mode = (display_mode + 1) % 2;
@@ -329,6 +453,17 @@ void key_process(unsigned char key)
         pOT->_compute_error(pM);
     }
     break;
+    case 'u':
+        COMTMesh *wdt_mesh = pOT->pWeightedDT();
+        for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
+        {
+            COMTMesh::CVertex *pv = *viter;
+            pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
+        }
+        wdt_mesh->labelBoundary();
+        pOT = new CDomainOptimalTransport(wdt_mesh);
+        pOT->_initialize(true);
+        break;
     }
 }
 /*! Keyboard call back function */

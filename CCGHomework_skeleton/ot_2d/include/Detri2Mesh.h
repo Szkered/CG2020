@@ -123,17 +123,15 @@ inline void CDetri2Mesh::__detri2_generate_disk(detri2::Triangulation *&domainTr
     generate_wdt(ptlist, input_weights, boundary_edge_list, true, &domainTr, missing_point_list);
 
     // for debugging
-    /*
-    COMTMesh* pM = new COMTMesh;
-    export_Detri2_to_OMTmesh(domainTr, pM);
-    for (COMTMesh::MeshVertexIterator viter(pM); !viter.end(); viter++)
-    {
-        COMTMesh::CVertex* pv = *viter;
-        pv->point() = CPoint(pv->uv()[0], pv->uv()[1], 0);
-    }
-    pM->labelBoundary();
-    pM->write_m("Circle.m");
-    */
+    // COMTMesh *pM = new COMTMesh;
+    // export_Detri2_to_OMTmesh(domainTr, pM);
+    // for (COMTMesh::MeshVertexIterator viter(pM); !viter.end(); viter++)
+    // {
+    //     COMTMesh::CVertex *pv = *viter;
+    //     pv->point() = CPoint(pv->uv()[0], pv->uv()[1], 0);
+    // }
+    // pM->labelBoundary();
+    // pM->write_m("Circle.m");
 };
 
 /*

@@ -47,6 +47,10 @@ class CDomainOptimalTransport : public CBaseOT, public CDetri2Mesh
      */
     void __newton(COMTMesh *pInput, COMTMesh *&pOutput);
 
+    void set_target_measure_to_uniform();
+
+    void find_singularities(COMTMesh *pInput);
+
     /* data members */
   public:
     // Weighted Delaunay Mesh
@@ -61,11 +65,12 @@ class CDomainOptimalTransport : public CBaseOT, public CDetri2Mesh
         return m_pMesh;
     };
 
+  public:
+    double total_target_area = 0.0;
+
   protected:
     // triangle mesh for the Weighted Delaunay Triangulation
     COMTMesh *m_pWDT = NULL;
-
-    double total_target_area = 0.0;
 
     // triangulation for the background domain
     detri2::Triangulation *m_domainTr = NULL;
