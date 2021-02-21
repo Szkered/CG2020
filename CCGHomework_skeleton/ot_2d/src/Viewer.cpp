@@ -84,6 +84,7 @@ CPoint ObjTrans(0, 0, 0);
 CQrot LightRot(1, 0, 0, 0);
 
 CPoint LightPosition;
+CPoint LightPosition_2;
 
 /* global mesh */
 COMTMesh mesh;
@@ -123,6 +124,16 @@ void setupLight()
     GLfloat lightOnePosition[4] = {(GLfloat)LightPosition[0], (GLfloat)LightPosition[1], (GLfloat)LightPosition[2],
                                    0.0f};
     glLightfv(GL_LIGHT1, GL_POSITION, lightOnePosition);
+
+    CQrot v_2(0, 0, 0, 1); // for mnist only
+    CQrot CL_2(LightRot.m_w, -LightRot.m_x, -LightRot.m_y, -LightRot.m_z);
+    CL_2 = LightRot * v_2 * CL_2;
+
+    LightPosition_2 = CPoint(CL_2.m_x, CL_2.m_y, CL_2.m_z);
+
+    GLfloat lightOnePosition_2[4] = {(GLfloat)LightPosition_2[0], (GLfloat)LightPosition_2[1],
+                                     (GLfloat)LightPosition_2[2], 0.0f};
+    glLightfv(GL_LIGHT2, GL_POSITION, lightOnePosition_2);
 }
 
 void draw_voronoi_cell(COMTMesh *pMesh)
@@ -150,8 +161,21 @@ void draw_voronoi_cell(COMTMesh *pMesh)
 
                 if (show_height)
                 {
-                    glVertex3d(p[0], p[1], p[2]);
-                    glVertex3d(q[0], q[1], p[2]);
+
+                    // glVertex3d(p[0], p[1], p[2]);
+                    // glVertex3d(q[0], q[1], p[2]);
+
+                    if (show_height == 1)
+                    {
+                        glVertex3d(p[0], p[1], p[2]);
+                        glVertex3d(q[0], q[1], q[2]);
+                    }
+                    else
+                    {
+                        // glVertex3f(p[0], p[1], p[2] + 0.5 * (p[0] * p[0] + p[1] * p[1]));
+                        glVertex3d(p[0], p[1], pV->weight() + 0.5 * pV->uv().norm2());
+                        glVertex3d(q[0], q[1], pV->weight() + 0.5 * pV->uv().norm2());
+                    }
                 }
                 else
                 {
@@ -264,7 +288,22 @@ void draw_weighted_delaunay(COMTMesh *pMesh)
             {
                 COMTMesh::CVertex *pV = *fviter;
                 CPoint p = pV->point();
-                glVertex3f(p[0], p[1], p[2]);
+
+                if (show_height)
+                {
+                    if (show_height == 1)
+                    {
+                        glVertex3f(p[0], p[1], p[2]);
+                    }
+                    else
+                    {
+                        glVertex3f(p[0], p[1], pV->weight() + 0.5 * pV->uv().norm2());
+                    }
+                }
+                else
+                {
+                    glVertex3f(p[0], p[1], 0);
+                }
             }
         }
     }
@@ -384,11 +423,11 @@ void key_process(unsigned char key)
         break;
     case 'm': {
         COMTMesh *wdt_mesh = pOT->pWeightedDT();
-        for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
-        {
-            COMTMesh::CVertex *pv = *viter;
-            pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
-        }
+        // for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
+        // {
+        //     COMTMesh::CVertex *pv = *viter;
+        //     pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
+        // }
         wdt_mesh->labelBoundary();
         wdt_mesh->write_m("output.m");
     }
@@ -455,14 +494,22 @@ void key_process(unsigned char key)
     break;
     case 'u':
         COMTMesh *wdt_mesh = pOT->pWeightedDT();
-        for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
-        {
-            COMTMesh::CVertex *pv = *viter;
-            pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
-        }
-        wdt_mesh->labelBoundary();
-        pOT = new CDomainOptimalTransport(wdt_mesh);
-        pOT->_initialize(true);
+        // for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
+        // {
+        //     COMTMesh::CVertex *pv = *viter;
+        //     // pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
+        //     pv->point() = CPoint(pv->uv()[0], pv->uv()[1], 0);
+        // }
+        pOT->_set_target_measure(wdt_mesh, pOT->total_target_area, true);
+        // for (COMTMesh::MeshVertexIterator viter(wdt_mesh); !viter.end(); viter++)
+        // {
+        //     COMTMesh::CVertex *pv = *viter;
+        //     // pv->uv() = CPoint2(pv->point()[0], pv->point()[1]);
+        //     pv->point() = CPoint(pv->uv()[0], pv->uv()[1], 0);
+        // }
+        // wdt_mesh->labelBoundary();
+        // pOT = new CDomainOptimalTransport(wdt_mesh);
+        // pOT->_initialize(true);
         break;
     }
 }

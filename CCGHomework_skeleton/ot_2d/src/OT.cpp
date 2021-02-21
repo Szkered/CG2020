@@ -45,7 +45,7 @@ void CBaseOT::_normalize_uv(COMTMesh *pMesh)
             COMTMesh::CVertex *pv = *fviter;
             uvs.push_back(pv->uv());
         }
-        total_area += (uvs[1] - uvs[0]) ^ (uvs[2] - uvs[0]);
+        total_area += (uvs[1] - uvs[0]) ^ (uvs[2] - uvs[0]) / 2;
     }
 
     std::cout << "Total Area " << total_area << std::endl;
@@ -61,7 +61,7 @@ void CBaseOT::_normalize_uv(COMTMesh *pMesh)
         COMTMesh::CVertex *pv1 = pMesh->edgeVertex1(pe);
         COMTMesh::CVertex *pv2 = pMesh->edgeVertex2(pe);
 
-        (pv1->uv() + pv2->uv()) * pMesh->edgeLength(pe) / 2.0;
+        s += (pv1->uv() + pv2->uv()) * pMesh->edgeLength(pe) / 2.0;
         total_length += pMesh->edgeLength(pe);
     }
 
@@ -162,7 +162,7 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
     m_gradient.resize(m_pMesh->numVertices());
     // m_gradient.resize(m_pMesh->numVertices() + 1);
 
-#pragma omp parallel for
+    // #pragma omp parallel for
     for (int i = 0; i < m_pMesh->numVertices(); ++i)
     {
         int id = ids[i];
@@ -193,7 +193,7 @@ void CBaseOT::__update_direction(COMTMesh *m_pMesh)
     else
     {
         // m_direction.normalize();
-#pragma omp parallel for
+        // #pragma omp parallel for
         for (int i = 0; i < m_pMesh->numVertices(); i++)
         {
             int id = ids[i];

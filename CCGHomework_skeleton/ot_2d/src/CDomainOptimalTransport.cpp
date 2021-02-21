@@ -227,7 +227,8 @@ void CDomainOptimalTransport::__newton(
     __update_direction(pInput);
 
     /*! set initial step length */
-    double step_length = 1.0;
+    // double step_length = 1.0;
+    double step_length = 0.5;
     /*! pointer to the output WDT */
     detri2::Triangulation *pTr = NULL;
     /*! temparary mesh */
